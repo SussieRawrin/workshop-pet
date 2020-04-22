@@ -16,8 +16,9 @@
 - Workshop Pet is a program that allows you to download and save multiple workshop files very quickly by automating in-game input. You can choose to either download the program and save files manually or to add them to the [online archive](https://archive.workshopcodes.com/)
 
 * It powers [archive.workshopcodes.com](http://archive.worshopcodes.com/) which is an archival microservice for [workshopcodes.com](https://workshopcodes.com/). If you are just worried about saving your workshop codes, you can import them on that site and they will be saved to the archive too
+
 	* An example is available here @ https://archive.workshopcodes.com/GC26Y
-	* If ya want any help please join our discord @  https://discord.gg/Rju6xv9
+	* If ya want any help please join the discord @  https://discord.gg/Rju6xv9
 
 ### What's the point?
 * A few workshop creators I'm friends with were concerned with the possibility of their games being deleted, I made this code archiver to help. It allows you to download all your workshop games quickly to your PC and lets you rest easy knowing they are backed up
@@ -37,6 +38,7 @@ codes waiting to be saved. If you want to do this please join our discord (above
 # How can I download my workshop games?
 
 * If you are worried about your games, in most cases you can just import them in our discord (above) with a command ex. `!archive GC26Y, AX9GA` and the bot will add it to the [online archive](https://archive.workshopcodes.com/). If you need to save many files to PC, you can run this program on your computer
+
 	1. Actually downloading and running PET is not the best option for most people
 
 
