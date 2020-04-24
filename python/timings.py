@@ -8,7 +8,7 @@ delay = {
     # the delay from when overwatch is opened to the sign in box
     # also the delay from sign in to welcome page
     # most of the delay is due to network conditions
-    "overwatch": 9,
+    "overwatch": 14,
 
     # time from hitting the "Create Game" button to having an interface again
     "ow_lobby": .9,
