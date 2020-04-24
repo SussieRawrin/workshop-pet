@@ -211,9 +211,12 @@ async def fromWelcomeToDownload():
     await asyncio.sleep(_animation_delay)
 
     # tap "GAME BROWSER"
-    # ◀️ (left), ◀️ (left), 🌌 (space)
-    py.hotkey("left")
-    py.hotkey("left")
+    # Note: (left) x2, (space) will not work if there is an experimental card
+    # ⏩ (right), ⏩ (right), ⏩ (right), ⏩ (right), 🌌 (space)
+    py.hotkey("right")
+    py.hotkey("right")
+    py.hotkey("right")
+    py.hotkey("right")
     py.hotkey("space")
 
     # Animation Delay
