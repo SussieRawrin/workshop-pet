@@ -3,6 +3,7 @@ delay = {
 
     # delay for switching between UI "pages"
     # only in places where a delay of 0 didn't work
+    # "animation": .4,
     "animation": .4,
 
     # the delay from when overwatch is opened to the sign in box
@@ -12,7 +13,8 @@ delay = {
 
     # time from hitting the "Create Game" button to having an interface again
     "ow_lobby": .9,
-    "download": 2,
+    "download": 4,
+    "max_download": 8,
 
     # if the queue is empty, 
     # "queue_wait": .9,
@@ -22,8 +24,10 @@ delay = {
     # typing speed
     # too fast can mess up text (.0009 fails approx one in twenty attempts)
     "typing": .009,
+    # "typing": .09,
     
     # polling interval for application window
     # interval for Save File queue
     "interval": .2,
+    "image_polling": .2,
 }

@@ -79,7 +79,7 @@ class QueueManager:
     def addCode(self, code):
 
         # Delete code if it's not in a format
-        if not re.search("^[A-z0-9]{5}$", code):
+        if not re.search("^[A-z0-9]{5,6}$", code):
             print(f'{ sad() }: received bad input { colored(code, "magenta") }')
             self.deleteCode(code)
             return

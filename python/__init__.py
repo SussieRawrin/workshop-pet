@@ -25,7 +25,7 @@ from options import newConfig
 from termcolor import colored
 
 # package
-from automate import quitOverwatch, overwatch, wait, signin, fromWelcomeToDownload, download
+from hybridAutomate import quitOverwatch, overwatch, wait, signin, fromWelcomeToDownload, download
 from timings import delay
 from queueHandler import bootQueue
 from emoji import sad
@@ -34,6 +34,8 @@ from errors import InvalidVariables
 # queue data
 # queue = ['vcc9v', 'W468T']
 isQuit = False
+
+pm = None
 
 
 # Main Process

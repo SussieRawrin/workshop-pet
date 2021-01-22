@@ -1,6 +1,6 @@
 
 # Native Packages
-import os, subprocess, sys, asyncio
+import os, subprocess, sys, asyncio, time
 from threading import Thread
 
 # Additional Dependencies
@@ -9,6 +9,9 @@ import pyperclip
 
 # Automation Packages
 import pyautogui as py
+
+# use px when py does not work (video games)
+# import pydirectinput as px
 import pygetwindow as pw
 
 # package
@@ -28,6 +31,75 @@ __invalid__description = "Whoops.. Import Error D:"
 __default__code = "settings{main{Description: \"" + __invalid__description +"\"}modes{Practice Range}}"
 
 _dataManager = None
+
+
+# finds an image on display
+def findImage(image, _confidence=.9, _grayscale=False):
+
+    # confidence needs
+    # pip install opencv-python
+    _size = 'md'
+
+    # window.activate()
+    return py.locateCenterOnScreen(f'python{ os.path.sep }animations{ os.path.sep }{ _size }{ os.path.sep }{ image }.png', confidence=_confidence, grayscale=_grayscale)
+
+# waits for an image on display
+async def waitForImage(image, _confidence=.9, _grayscale=False, timeout=0):
+
+    if timeout > 0:
+        start = time.time()
+
+    position = findImage(image, _confidence=_confidence, _grayscale=_grayscale)
+
+    while (not position):
+
+        if timeout > 0 and time.time() > start + timeout:
+            return position
+
+        await asyncio.sleep(delay["image_polling"])
+        position = findImage(image, _confidence=_confidence, _grayscale=_grayscale)
+
+    # testing
+    # await asyncio.sleep(delay["image_polling"])
+    return position
+
+# waits for an image on display to disappear
+async def waitForNotImage(image, _confidence=.9, _grayscale=False, timeout=0):
+
+    if timeout > 0:
+        start = time.time();
+
+    position = findImage(image, _confidence=_confidence, _grayscale=_grayscale)
+
+    while (position):
+
+        if timeout > 0 and time.time() > start + timeout:
+            return False
+
+        await asyncio.sleep(delay["image_polling"])
+        position = findImage(image, _confidence=_confidence, _grayscale=_grayscale)
+
+    # testing
+    # await asyncio.sleep(delay["image_polling"])
+    return True
+
+# video game
+def click():
+    py.mouseDown()
+    py.mouseUp()
+
+# kinda only needs to be done once to focus scree
+# probably better to do it always
+def clickAt(position):
+    py.mouseDown(position)
+    py.mouseUp(position)
+
+# navigates by waiting for images and tapping them
+async def navigate(*images):
+    for image in images:
+      clickAt(await waitForImage(image))
+
+
 
 
 # Start Overwatch
@@ -65,6 +137,8 @@ async def quitOverwatch():
 
 # waits for an open overwatch window
 async def waitForWindow():
+
+    print(f'{ happy() }: Waiting for { colored("Overwatch", "yellow", attrs=["bold"]) } window')
 
     # new window
     global window
@@ -111,9 +185,9 @@ async def waitForWindow():
     print(f'{ happy() }: Window minimized to { colored(x, "red") } x { colored(y, "red") } pixels')
 
     # wait for the window to be active
-    await wait(delay.get("overwatch"))
-
-    window.activate()
+    # py.moveTo(await waitForImage('login-dark'), duration=.09, tween=py.easeInOutCirc)
+    # click to focus text (normal click will not work anymore for first focus)
+    clickAt(await waitForImage('login-dark'))
 
 
 # async wait
@@ -122,13 +196,9 @@ async def wait(seconds):
     print(f'{ happy() }: waiting { colored(str(seconds) + "s", "red") }')
     await asyncio.sleep(seconds)
 
-    window.activate()
-
 
 # types the name and password in the sign in boxes
 async def signin():
-
-    window.activate()
 
     print(f'{ happy() }: Signing in..')
 
@@ -136,16 +206,17 @@ async def signin():
     creds = os.getenv("PASSWORD").replace("[", "").replace("]", "").split(", ")
 
     # sign in
+    window.activate()
     py.write(creds[0], interval=_typing_delay)
     py.hotkey("tab")
     py.write(creds[1], interval=_typing_delay)
-    py.hotkey("enter")
-
-    await wait(delay.get("overwatch"))
+    
+    # py.hotkey("enter")
+    window.activate()
+    clickAt(await waitForImage('login'))
 
 # preps from import icon
 async def prep():
-
 
     # Invalid Code
     pyperclip.copy(__default__code)
@@ -160,37 +231,8 @@ async def prep():
     # if not working its just this issue
     window.restore()
 
-    # Animation Delay
-    await asyncio.sleep(_animation_delay)
-
-    # tap the "PASTE" icon
-    # 🍺 (tab),  ⏩ (right) ⏩ (right) ⏩ (right) ⏩ (right) ⏩ (right), 🌌 (space)
-    py.hotkey("tab")
-    py.hotkey("right")
-    py.hotkey("right")
-    py.hotkey("right")
-    py.hotkey("right")
-    py.hotkey("right")
-    py.hotkey("space")
-
-    # Animation Delay
-    await asyncio.sleep(_animation_delay)
-
-    # Accept Warning
-    # ⬇️ (down), 🌌 (space)
-    py.hotkey("down")
-    py.hotkey("space")
-
-    # Animation Delay
-    await asyncio.sleep(_animation_delay)
-
-    # tap the "IMPORT" icon
-    # ◀️ (left), ◀️ (left), ◀️ (left), ◀️ (left), 🌌 (space)
-    py.hotkey("left")
-    py.hotkey("left")
-    py.hotkey("left")
-    py.hotkey("left")
-    py.hotkey("space")
+    # paste workshop and navigate to download
+    await navigate('paste', 'confirm', 'download')
 
 
 # Navigates from the Welcome page to the Download page
@@ -198,48 +240,24 @@ async def fromWelcomeToDownload():
 
     window.activate()
 
-    print(f'{ happy() }: navigating from { colored("Welcome", "green") } to { colored("Download", "blue") }')
+    print(f'{ happy() }: navigating from { colored("Main Menu", "green") } to { colored("Download", "blue") }')
 
     # Animation Delay
-    await asyncio.sleep(_animation_delay)
+    await waitForImage('add_friend')
+
+    # exit custom game if joined back in
+    if not await waitForImage('play', _grayscale=True, _confidence=.6, timeout=4):
+        print(f'{ sad() }: exiting { colored("custom game", "blue") }')
+        # navigating out of a joined custom game will go back to main menu
+        await navigate('exit', 'yes')
+    else:
+        print('not in custom gaem')
 
     # tap "PLAY"
-    # ⬇️ (down), 🌌 (space)
-    py.hotkey("down")
-    py.hotkey("space")
-
-    # Animation Delay
-    await asyncio.sleep(_animation_delay)
-
-    # tap "GAME BROWSER"
-    # Note: (left) x2, (space) will not work if there is an experimental card
-    # ⏩ (right), ⏩ (right), ⏩ (right), ⏩ (right), 🌌 (space)
-    py.hotkey("right")
-    py.hotkey("right")
-    py.hotkey("right")
-    py.hotkey("right")
-    py.hotkey("space")
-
-    # Animation Delay
-    await asyncio.sleep(_animation_delay)
-
-    # tap "CREATE"
-    # 🍺 (tab), 🍺 (tab), 🍺 (tab), 🍺 (tab), 🌌 (space)
-    py.hotkey("tab")
-    py.hotkey("tab")
-    py.hotkey("tab")
-    py.hotkey("tab")
-    py.hotkey("space")
-
-    # Minor Network Delay
-    await asyncio.sleep(delay.get("ow_lobby"))
-
-    # tap "SETTINGS"
-    # ◀️ (left), ⏫ (up), ◀️ (left), 🌌 (space)
-    py.hotkey("left")
-    py.hotkey("up")
-    py.hotkey("left")
-    py.hotkey("space")
+    clickAt(await waitForImage('play', _grayscale=True, _confidence=.6))
+        
+    # navigate from the "PLAY" page to the "CUSTOM GAME" settings page
+    await navigate('game_browser', 'create', 'settings')
 
     global _dataManager
     _dataManager = bootArchive()
@@ -267,44 +285,48 @@ async def download(code):
     py.write(code, interval=_typing_delay)
     py.hotkey("enter")
 
-    # Major Network Delay
-    await asyncio.sleep(delay.get("download"))
-
-    # tap the "COPY" icon
-    # ⏩ (right), ⏩ (right), ⏩ (right), 🌌 (space)
-    py.hotkey("right")
-    py.hotkey("right")
-    py.hotkey("right")
-    py.hotkey("space")
-    
     # Animation Delay
     await asyncio.sleep(_animation_delay)
 
-    # if the import text is in the first 64
-    # @x9v0
-    failed = bool(
-        0 < pyperclip.paste().find('Description: "Whoops.. Import Error D:"', 0, 64) or
-        16 > len(pyperclip.paste())
-    )
+    # Wait for downloaded code
+    downloaded = await waitForNotImage('default_workshop', timeout=delay.get("max_download"))
 
-    if failed:
+    if not downloaded:
 
         print(colored("(failed)", "red", attrs=["blink", "bold"]))
         print(colored("    • INVALID CODE"))
 
     else:
 
-        # Save file to archive
-        def __archive(code, text):
-            _dataManager.addToArchive(code, text)
+        # tap the "COPY" icon
+        await navigate('copy')
 
-        # Archive Data (temporary non daemon thread)
-        Thread(target=__archive, args=(code, pyperclip.paste(),)).start()
+        # if the import text is in the first 64
+        # @x9v0
+        failed = bool(
+            0 < pyperclip.paste().find('Description: "Whoops.. Import Error D:"', 0, 64) or
+            16 > len(pyperclip.paste())
+        )
 
-        print("(done)")
+        if failed:
 
-    # next download
-    py.hotkey("tab")
+            print(colored("(failed)", "orange", attrs=["blink", "bold"]))
+            print(colored("    • BAD COPY"))
+
+        else:
+
+            # Save file to archive
+            def __archive(code, text):
+                _dataManager.addToArchive(code, text)
+
+            # Archive Data (temporary non daemon thread)
+            Thread(target=__archive, args=(code, pyperclip.paste(),)).start()
+
+            print("(done)")
+
+    # Animation Delay
+    await asyncio.sleep(_animation_delay)
+
     await prep()
 
-    return not failed
+    return downloaded
